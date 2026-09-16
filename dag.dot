@@ -1,0 +1,14 @@
+strict digraph {
+"preprocess";
+"visualize";
+"train";
+"visualize_models";
+"register_model";
+"data\mental_health_data.csv.dvc";
+"preprocess" -> "visualize";
+"preprocess" -> "train";
+"train" -> "visualize_models";
+"train" -> "register_model";
+"data\mental_health_data.csv.dvc" -> "preprocess";
+}
+

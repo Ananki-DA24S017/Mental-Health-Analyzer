@@ -1,0 +1,54 @@
+stages:
+  preprocess:
+    cmd: python src/data_processing/preprocess.py
+    deps:
+      - src/data_processing/preprocess.py
+      - data/mental_health_data.csv
+    outs:
+      - data/processed/train.csv
+      - data/processed/val.csv
+      - data/processed/test.csv
+      - data/processed/category_mapping.json
+    metrics:
+      - data/processed/pipeline_metrics.json:
+          cache: false
+  
+  visualize:
+    cmd: python src/data_processing/visualize_metrics.py
+    deps:
+      - src/data_processing/visualize_metrics.py
+      - data/processed/pipeline_metrics.json
+    outs:
+      - reports/processing_times.png
+      - reports/processing_throughput.png
+  
+  train:
+    cmd: python src/model_training/train_models.py
+    deps:
+      - src/model_training/train_models.py
+      - data/processed/train.csv
+      - data/processed/val.csv
+      - data/processed/test.csv
+      - data/processed/category_mapping.json
+    outs:
+      - models/model_comparison.csv
+      - models/model_info.json
+
+  visualize_models:
+    cmd: python src/model_training/visualize_models.py
+    deps:
+      - src/model_training/visualize_models.py
+      - models/model_comparison.csv
+    outs:
+      - reports/model_comparison/model_accuracy_comparison.png
+      - reports/model_comparison/model_f1_comparison.png
+      - reports/model_comparison/model_training_time_comparison.png
+      - reports/model_comparison/accuracy_vs_time.png
+
+  register_model:
+    cmd: python src/model_training/register_model.py
+    deps:
+      - src/model_training/register_model.py
+      - models/model_info.json
+    outs:
+      - models/registration_info.json

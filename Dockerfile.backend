@@ -1,0 +1,25 @@
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements and install early for better caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY models/ /app/models/
+COPY main.py /app/
+
+# Create logs directory for mounted logging
+RUN mkdir -p /app/logs
+
+# Set environment variables
+ENV MODEL_PATH=/app/models/best_model.pkl
+ENV PYTHONUNBUFFERED=1
+
+# Expose ports for FastAPI (8000) and metrics (served on same port)
+EXPOSE 8000
+
+# Default command to run FastAPI app using uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
